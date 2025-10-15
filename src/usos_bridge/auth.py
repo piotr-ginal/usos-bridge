@@ -1,7 +1,15 @@
+from typing import NamedTuple
 from urllib.parse import urlencode
 
 import httpx
 from bs4 import BeautifulSoup as Bs
+
+MAX_AUTH_RETRY: int = 4
+
+
+class AuthPair(NamedTuple):
+    cookie: str
+    csrf_token: str
 
 
 def _construct_auth_page_url() -> str:
@@ -52,3 +60,47 @@ def _authorize_client(username: str, password: str, client: httpx.Client) -> Non
 
     if client.cookies.get("PHPSESSID") is None:
         raise RuntimeError  # TODO(ginal): custom error here
+
+
+def get_auth_pair(username: str, password: str) -> AuthPair:
+    with httpx.Client() as client:
+        _authorize_client(username, password, client)
+        cookies: httpx.Cookies = client.cookies
+
+    return AuthPair(cookies["PHPSESSID"], "")
+
+
+class WebUsosAuthenticator:
+    def __init__(self, username: str, password: str) -> None:
+        self._username: str = username
+        self._password: str = password
+
+        self._auth_pair: AuthPair | None = None
+
+    def _ensure_valid_auth_pair(self, *, retry: int = 1) -> AuthPair:
+        if retry > MAX_AUTH_RETRY:
+            raise RuntimeError  # TODO(ginal): implement custom error
+
+        try:
+            self._auth_pair = get_auth_pair(self._username, self._password)
+        except Exception:  # noqa: BLE001 TODO(ginal): catch possible errors here
+            return self._ensure_valid_auth_pair(retry=retry + 1)
+
+        return self._auth_pair
+
+    def refresh(self) -> None:
+        self._ensure_valid_auth_pair()
+
+    @property
+    def cookie(self) -> str:
+        if self._auth_pair is None:
+            return self._ensure_valid_auth_pair().cookie
+
+        return self._auth_pair.cookie
+
+    @property
+    def csrf_token(self) -> str:
+        if self._auth_pair is None:
+            return self._ensure_valid_auth_pair().csrf_token
+
+        return self._auth_pair.csrf_token
