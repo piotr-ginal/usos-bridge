@@ -1,3 +1,4 @@
+import re
 from typing import NamedTuple
 
 import httpx
@@ -35,6 +36,18 @@ def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Clie
     raise RuntimeError(msg)  # TODO(ginal): custom error
 
 
+def _get_csrf_token(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> str:
+    response = client.get(instance_cfg.csrf_token_page)
+
+    match = re.search(instance_cfg.csrf_token_webpage, response.text)
+
+    if match is not None:
+        return match.group(1)  # TODO(ginal): test for checking regex pattern - if it has a singular group
+
+    msg = "csrf token not found on page"
+    raise RuntimeError(msg)  # TODO(ginal): custom error here
+
+
 def _authorize_client(instance_cfg: UsosInstanceConfig, username: str, password: str, client: httpx.Client) -> None:
     auth_endpoint = _get_login_endpoint_url(instance_cfg, client)
 
@@ -52,8 +65,9 @@ def get_auth_pair(instance_cfg: UsosInstanceConfig, username: str, password: str
     with httpx.Client() as client:
         _authorize_client(instance_cfg, username, password, client)
         cookies: httpx.Cookies = client.cookies
+        csrf_token = _get_csrf_token(instance_cfg, client)
 
-    return AuthPair(cookies[instance_cfg.session_cookie_name], "")
+    return AuthPair(cookies[instance_cfg.session_cookie_name], csrf_token)
 
 
 class WebUsosAuthenticator:
