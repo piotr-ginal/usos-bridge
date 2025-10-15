@@ -17,6 +17,9 @@ dynamic = ["dependencies"]
 package-dir = { "" = "src" }
 include-package-data = true
 
+[tool.setuptools.package-data]
+"usos_bridge" = ["data/*"]
+
 [tool.setuptools.dynamic]
 dependencies = { file = "requirements/base.txt" }
 
