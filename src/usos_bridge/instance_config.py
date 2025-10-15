@@ -16,6 +16,7 @@ class UsosInstanceConfig(BaseModel):
     login_form_selector: str
     csrf_token_regex: str
     csrf_token_page: str
+    csrf_token_data_key: str
 
     model_config = ConfigDict(frozen=True)
 
