@@ -14,7 +14,7 @@ class UsosInstanceConfig(BaseModel):
     proxy_api_method_param_key: str
     session_cookie_name: str
     login_form_selector: str
-    csrf_token_webpage: str
+    csrf_token_regex: str
     csrf_token_page: str
 
     model_config = ConfigDict(frozen=True)

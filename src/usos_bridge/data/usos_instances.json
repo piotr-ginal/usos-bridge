@@ -7,6 +7,6 @@
     "session_cookie_name": "PHPSESSID",
     "login_form_selector": "form.login-form",
     "csrf_token_page": "https://web.usos.pwr.edu.pl/kontroler.php?_action=home/usos_mail/historia",
-    "csrf_token_webpage": "csrftoken\\s*=\\s*\"(\\d{4}-\\d{2}-\\d{2}-[a-f0-9]{16})\";"
+    "csrf_token_regex": "csrftoken\\s*=\\s*\"(\\d{4}-\\d{2}-\\d{2}-[a-f0-9]{16})\";"
   }
 ]

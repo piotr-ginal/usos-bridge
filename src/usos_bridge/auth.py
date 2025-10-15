@@ -39,7 +39,7 @@ def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Clie
 def _get_csrf_token(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> str:
     response = client.get(instance_cfg.csrf_token_page)
 
-    match = re.search(instance_cfg.csrf_token_webpage, response.text)
+    match = re.search(instance_cfg.csrf_token_regex, response.text)
 
     if match is not None:
         return match.group(1)  # TODO(ginal): test for checking regex pattern - if it has a singular group
