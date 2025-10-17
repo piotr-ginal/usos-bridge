@@ -6,8 +6,6 @@ from bs4 import BeautifulSoup as Bs
 
 from usos_bridge.instance_config import UsosInstanceConfig
 
-MAX_AUTH_RETRY: int = 4
-
 
 class AuthPair(NamedTuple):
     cookie: str
@@ -78,30 +76,24 @@ class WebUsosAuthenticator:
 
         self._auth_pair: AuthPair | None = None
 
-    def _ensure_valid_auth_pair(self, *, retry: int = 1) -> AuthPair:
-        if retry > MAX_AUTH_RETRY:
-            raise RuntimeError  # TODO(ginal): implement custom error
+    def _get_valid_auth_pair(self) -> AuthPair:
 
-        try:
-            self._auth_pair = get_auth_pair(self._instance_config, self._username, self._password)
-        except Exception:  # noqa: BLE001 TODO(ginal): catch possible errors here
-            return self._ensure_valid_auth_pair(retry=retry + 1)
-
+        self._auth_pair = get_auth_pair(self._instance_config, self._username, self._password)
         return self._auth_pair
 
     def refresh(self) -> None:
-        self._ensure_valid_auth_pair()
+        self._get_valid_auth_pair()
 
     @property
     def cookie(self) -> str:
         if self._auth_pair is None:
-            return self._ensure_valid_auth_pair().cookie
+            return self._get_valid_auth_pair().cookie
 
         return self._auth_pair.cookie
 
     @property
     def csrf_token(self) -> str:
         if self._auth_pair is None:
-            return self._ensure_valid_auth_pair().csrf_token
+            return self._get_valid_auth_pair().csrf_token
 
         return self._auth_pair.csrf_token
