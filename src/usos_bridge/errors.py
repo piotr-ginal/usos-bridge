@@ -27,14 +27,14 @@ class InvalidCsrfTokenError(AuthenticationError):
 
     def __init__(self, status_code: int, response_text: str, message_template: str | None = None) -> None:
         if message_template is None:
-            message_temaplate = INVALID_CSRF_TOKEN_ERROR_MSG_TEMPLATE
+            message_template = INVALID_CSRF_TOKEN_ERROR_MSG_TEMPLATE
 
-        super().__init__(status_code, response_text, message_temaplate)
+        super().__init__(status_code, response_text, message_template)
 
 
 class InvalidCookieError(AuthenticationError):
     def __init__(self, status_code: int, response_text: str, message_template: str | None = None) -> None:
         if message_template is None:
-            message_temaplate = INVALID_COOKIE_ERROR_MSG_TEMPLATE
+            message_template = INVALID_COOKIE_ERROR_MSG_TEMPLATE
 
-        super().__init__(status_code, response_text, message_temaplate)
+        super().__init__(status_code, response_text, message_template)
