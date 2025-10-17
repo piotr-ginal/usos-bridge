@@ -19,7 +19,7 @@ def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Clie
 
     response.raise_for_status()
 
-    auth_page = Bs(response.text, "html.parser")
+    auth_page = Bs(response.text, "html.parser", multi_valued_attributes=None)
 
     login_form = auth_page.select_one(instance_cfg.login_form_selector)
 
@@ -27,7 +27,7 @@ def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Clie
         msg = "No login form found"
         raise RuntimeError(msg)  # TODO(ginal): custom error
 
-    auth_url = login_form.attrs.get("action")
+    auth_url = str(login_form.attrs.get("action"))
 
     if auth_url is not None:
         return auth_url
