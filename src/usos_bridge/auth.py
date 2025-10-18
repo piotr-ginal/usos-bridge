@@ -69,12 +69,19 @@ def get_auth_pair(instance_cfg: UsosInstanceConfig, username: str, password: str
 
 
 class WebUsosAuthenticator:
-    def __init__(self, username: str, password: str, instance_config: UsosInstanceConfig) -> None:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        instance_config: UsosInstanceConfig,
+        *,
+        auth_pair: AuthPair | None = None,
+    ) -> None:
         self._username: str = username
         self._password: str = password
         self._instance_config: UsosInstanceConfig = instance_config
 
-        self._auth_pair: AuthPair | None = None
+        self._auth_pair: AuthPair | None = auth_pair
 
     def _get_valid_auth_pair(self) -> AuthPair:
 
