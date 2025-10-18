@@ -3,6 +3,7 @@ from typing import NamedTuple
 import httpx
 from bs4 import BeautifulSoup as Bs
 
+from usos_bridge import errors
 from usos_bridge.instance_config import UsosInstanceConfig
 
 
@@ -14,23 +15,22 @@ class AuthPair(NamedTuple):
 def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> str:
     response = client.get(instance_cfg.auth_page_url)
 
-    response.raise_for_status()
+    if not response.is_success:
+        raise errors.LoginPageLoadError(response.status_code, response.text)
 
     auth_page = Bs(response.text, "html.parser", multi_valued_attributes=None)
 
     login_form = auth_page.select_one(instance_cfg.login_form_selector)
 
     if login_form is None:
-        msg = "No login form found"
-        raise RuntimeError(msg)  # TODO(ginal): custom error
+        raise errors.LoginFormNotFoundError
 
     auth_url = str(login_form.attrs.get("action"))
 
     if auth_url is not None:
         return auth_url
 
-    msg = "Auth url in login form not found"
-    raise RuntimeError(msg)  # TODO(ginal): custom error
+    raise errors.LoginActionURLNotFoundError
 
 
 def _get_csrf_token(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> str:
@@ -41,21 +41,20 @@ def _get_csrf_token(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> s
     if match is not None:
         return match.group(1)
 
-    msg = "csrf token not found on page"
-    raise RuntimeError(msg)  # TODO(ginal): custom error here
+    raise errors.CsrfTokenNotFoundError
 
 
 def _authorize_client(instance_cfg: UsosInstanceConfig, username: str, password: str, client: httpx.Client) -> None:
     auth_endpoint = _get_login_endpoint_url(instance_cfg, client)
 
-    client.post(
+    response = client.post(
         auth_endpoint,
         data={"username": username, "password": password},
         follow_redirects=True,
     )
 
     if client.cookies.get(instance_cfg.session_cookie_name) is None:
-        raise RuntimeError  # TODO(ginal): custom error here
+        raise errors.LoginFailedError(response.status_code, response.text)
 
 
 def get_auth_pair(instance_cfg: UsosInstanceConfig, username: str, password: str) -> AuthPair:

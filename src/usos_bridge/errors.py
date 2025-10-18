@@ -38,3 +38,27 @@ class InvalidCookieError(AuthenticationError):
             message_template = INVALID_COOKIE_ERROR_MSG_TEMPLATE
 
         super().__init__(status_code, response_text, message_template)
+
+
+class LoginFailedError(AuthenticationError):
+    pass
+
+
+class LoginPageLoadError(UsosHttpError):
+    pass
+
+
+class ParsingError(UsosBridgeError):
+    pass
+
+
+class LoginFormNotFoundError(ParsingError):
+    pass
+
+
+class LoginActionURLNotFoundError(ParsingError):
+    pass
+
+
+class CsrfTokenNotFoundError(ParsingError):
+    pass
