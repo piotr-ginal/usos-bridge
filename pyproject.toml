@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "usos_bridge"
-version = "0.0.1.dev1"
+version = "0.0.1"
 description = "Access the USOS API using your standard web credentials"
 authors = [{ name = "Piotr Ginał", email = "ginal.piotr11@gmail.com" }]
 readme = "README.md"
