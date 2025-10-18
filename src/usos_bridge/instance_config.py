@@ -1,6 +1,7 @@
+import re
 from importlib import resources
 
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
 
 from usos_bridge import data
 
@@ -14,11 +15,20 @@ class UsosInstanceConfig(BaseModel):
     proxy_api_method_param_key: str
     session_cookie_name: str
     login_form_selector: str
-    csrf_token_regex: str
+    csrf_token_regex: re.Pattern
     csrf_token_page: str
     csrf_token_data_key: str
 
     model_config = ConfigDict(frozen=True)
+
+    @field_validator("csrf_token_regex", mode="after")
+    @staticmethod
+    def _validate_csrf_token_regex(regex: re.Pattern) -> re.Pattern:
+        if regex.groups != 1:
+            msg = "Regex must have exactly one capturing group - csrf token value"
+            raise ValueError(msg)
+
+        return regex
 
 
 UsosInstanceConfigList = TypeAdapter(list[UsosInstanceConfig])

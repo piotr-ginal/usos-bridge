@@ -1,4 +1,3 @@
-import re
 from typing import NamedTuple
 
 import httpx
@@ -37,10 +36,10 @@ def _get_login_endpoint_url(instance_cfg: UsosInstanceConfig, client: httpx.Clie
 def _get_csrf_token(instance_cfg: UsosInstanceConfig, client: httpx.Client) -> str:
     response = client.get(instance_cfg.csrf_token_page)
 
-    match = re.search(instance_cfg.csrf_token_regex, response.text)
+    match = instance_cfg.csrf_token_regex.search(response.text)
 
     if match is not None:
-        return match.group(1)  # TODO(ginal): test for checking regex pattern - if it has a singular group
+        return match.group(1)
 
     msg = "csrf token not found on page"
     raise RuntimeError(msg)  # TODO(ginal): custom error here
