@@ -27,7 +27,7 @@ config = load_instance_configs()["pwr"]
 authenticator = WebUsosAuthenticator("usos web login", "usos web password", config)
 client = UsosApiClient(config, authenticator)
 
-response = client.request("services/users/user")
+response = client.request("services/users/user", {"fields": "id"})
 ```
 
 -----
