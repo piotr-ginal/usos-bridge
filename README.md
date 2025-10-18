@@ -30,6 +30,10 @@ client = UsosApiClient(config, authenticator)
 response = client.request("services/users/user", {"fields": "id"})
 ```
 
+A complete list of USOS instances and links to their official API documentation is available on the [USOS Apps Developer Page](https://apps.usos.edu.pl/developers/api/definitions/installations/).
+
+If your instance isn't listed, contributions are highly welcome. Feel free to open a pull request to add support yourself. You can also open an issue with your university's name, and I will do my best to add it. Please note that this will require us to work together, as I'll need your help with testing since I don't have access to your university's system.
+
 -----
 
 ## Development
